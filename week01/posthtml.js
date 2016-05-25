@@ -8,38 +8,33 @@ let html = `
 `;
 
 
-const jsReg = /(^|\s)js-(\w+)/i;
+const jsReg = /(?:^|\s)js-(\w+)/i;
 const bootstrapReg = /(^|\s)(col-(lg|xs|sm|md)?(-\w+)?-\d+|btn(-\w+)?(-\w+)?)/i;
 
 const plugin = (tree) => tree
   .match({attrs: {class: jsReg}}, (node) => {
-
-    let classes = node.attrs.class.split(' ');
+    const classes = node.attrs.class.split(' ');
     let jsClassIndexes = [];
-    let datas = classes.filter((className, classPosition) => {
+    const datas = classes.filter((className, classPosition) => {
       if (jsReg.test(className)) {
         jsClassIndexes.push(classPosition);
         return true;
       }
       return false;
     })
-    .map(jsClass => jsClass.match(jsReg)[2]).join(' ');
-
-    let filteredClasses = classes.filter((className, classPosition) => {
-        return className && !~jsClassIndexes.indexOf(classPosition);
-      });
+    .map(jsClass => jsClass.match(jsReg)[1]).join(' ');
 
     node.attrs['data-js'] = datas;
-    node.attrs.class = filteredClasses.join(' ');
+    node.attrs.class = classes.filter(
+      (className, classPosition) => className && !jsClassIndexes.includes(classPosition)
+    ).join(' ');
+
     return node;
   })
   .match({attrs: {class: bootstrapReg}}, (node) => {
-    let classes = node.attrs.class.split(' ');
+    const classes = node.attrs.class.split(' ');
+    node.attrs.class = classes.filter((item) => !bootstrapReg.test(item)).join(' ');
 
-    let filteredClasses = classes.filter((item) => {
-        return !bootstrapReg.test(item);
-      });
-    node.attrs.class = filteredClasses.join(' ');
     return node;
   });
 
