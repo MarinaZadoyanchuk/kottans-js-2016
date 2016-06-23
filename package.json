@@ -1,0 +1,25 @@
+{
+  "name": "kottans_homework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MarinaZadoyanchuk/kottans-js-2016.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MarinaZadoyanchuk/kottans-js-2016/issues"
+  },
+  "homepage": "https://github.com/MarinaZadoyanchuk/kottans-js-2016#readme",
+  "dependencies": {
+    "assert": "^1.4.1",
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  }
+}
