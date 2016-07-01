@@ -1,5 +1,3 @@
-const mapIterator = require('./src/mapIterator');
-
 class advancedPromise extends Promise{
 
   static map(iterable, mapper) {
@@ -14,12 +12,11 @@ class advancedPromise extends Promise{
 
         let arrResults = [];
         let done = 0;
-        const iterablePromises = mapIterator(iterableValue);
 
-        for( let promise of iterablePromises ) {
+        for( let promise of iterableValue ) {
           done++;
 
-          promise
+          Promise.resolve(promise)
             .then(result => {
               this.resolve(mapper(result))
                 .then(result => {
