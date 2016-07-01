@@ -1,37 +1,42 @@
+const mapIterator = require('./src/mapIterator');
+
 class advancedPromise extends Promise{
 
   static map(iterable, mapper) {
-    console.log(iterable);
-
 
     return new this((resolve, reject) => {
-      const iterableLenght = [...iterable].length;
-      let arrResults = new Array(iterableLenght);
-      let i = 0;
 
-      const checkDone = (arr) => {
-        return !arr.some(item => Object.is(item, undefined)) || i == iterableLenght
-      }
+      this.resolve(iterable).then(iterableValue => {
 
-      for(let promise of iterable) {
-        console.log(!(promise instanceof Promise))
-        if (!(promise instanceof Promise)) {
-          arrResults[i] = mapper(promise)
-          if (checkDone(arrResults)) resolve(arrResults)
-        } else {
-          promise.then(result => {
-            console.log(result, 'i:', i);
-            arrResults[i] = mapper(result);
-            if (checkDone(arrResults)) resolve(arrResults)
-          }, reject)
+        if ( Object.is(iterableValue, null) || typeof iterableValue[Symbol.iterator] !== 'function' ) {
+          reject( new TypeError('first argument is not iterableValue') )
         }
-        i++;
-      }
+
+        let arrResults = [];
+        let done = 0;
+        const iterablePromises = mapIterator(iterableValue);
+
+        for( let promise of iterablePromises ) {
+          done++;
+
+          promise
+            .then(result => {
+              this.resolve(mapper(result))
+                .then(result => {
+                  arrResults.push(result);
+                  if ( !--done )
+                    resolve(arrResults);
+                }, reject)
+            }, reject )
+        }
+      }, reject)
+
 
     })
 
   }
 
 }
+
 
 module.exports = advancedPromise;

@@ -37,7 +37,12 @@ describe("advancedPromise.map-test", function () {
     }
 
     function deferredMapper(val) {
-        return Promise.delay(1, mapper(val));
+        return new Promise( (resolve, reject) => {
+            setTimeout(() => {
+                resolve(mapper(val))
+            }, 100
+            )
+        });
     }
 
     specify("should map input values array", function() {
@@ -59,61 +64,61 @@ describe("advancedPromise.map-test", function () {
             assert.fail
         );
     });
-//
-//     specify("should map mixed input array", function() {
-//         var input = [1, Promise.resolve(2), 3];
-//         return advancedPromise.map(input, mapper).then(
-//             function(results) {
-//                 assert.deepEqual(results, [2,4,6]);
-//             },
-//             assert.fail
-//         );
-//     });
-//
-//     specify("should map input when mapper returns a promise", function() {
-//         var input = [1,2,3];
-//         return advancedPromise.map(input, deferredMapper).then(
-//             function(results) {
-//                 assert.deepEqual(results, [2,4,6]);
-//             },
-//             assert.fail
-//         );
-//     });
-//
-//     specify("should accept a promise for an array", function() {
-//         return advancedPromise.map(Promise.resolve([1, Promise.resolve(2), 3]), mapper).then(
-//             function(result) {
-//                 assert.deepEqual(result, [2,4,6]);
-//             },
-//             assert.fail
-//         );
-//     });
-//
-//     specify("should throw a TypeError when input promise does not resolve to an array", function() {
-//         return advancedPromise.map(Promise.resolve(123), mapper).caught(TypeError, function(e){
-//         });
-//     });
-//
-//     specify("should map input promises when mapper returns a promise", function() {
-//         var input = [Promise.resolve(1),Promise.resolve(2),Promise.resolve(3)];
-//         return advancedPromise.map(input, mapper).then(
-//             function(results) {
-//                 assert.deepEqual(results, [2,4,6]);
-//             },
-//             assert.fail
-//         );
-//     });
-//
-//     specify("should reject when input contains rejection", function() {
-//         var input = [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)];
-//         return advancedPromise.map(input, mapper).then(
-//             assert.fail,
-//             function(result) {
-//                 assert(result === 2);
-//             }
-//         );
-//     });
-// });
+
+    specify("should map mixed input array", function() {
+        var input = [1, Promise.resolve(2), 3];
+        return advancedPromise.map(input, mapper).then(
+            function(results) {
+                assert.deepEqual(results, [2,4,6]);
+            },
+            assert.fail
+        );
+    });
+
+    specify("should map input when mapper returns a promise", function() {
+        var input = [1,2,3];
+        return advancedPromise.map(input, deferredMapper).then(
+            function(results) {
+                assert.deepEqual(results, [2,4,6]);
+            },
+            assert.fail
+        );
+    });
+
+    specify("should accept a promise for an array", function() {
+        return advancedPromise.map(Promise.resolve([1, Promise.resolve(2), 3]), mapper).then(
+            function(result) {
+                assert.deepEqual(result, [2,4,6]);
+            },
+            assert.fail
+        );
+    });
+
+    specify("should throw a TypeError when input promise does not resolve to an array", function() {
+        return advancedPromise.map(Promise.resolve(123), mapper).caught(TypeError, function(e){
+        });
+    });
+
+    specify("should map input promises when mapper returns a promise", function() {
+        var input = [Promise.resolve(1),Promise.resolve(2),Promise.resolve(3)];
+        return advancedPromise.map(input, mapper).then(
+            function(results) {
+                assert.deepEqual(results, [2,4,6]);
+            },
+            assert.fail
+        );
+    });
+
+    specify("should reject when input contains rejection", function() {
+        var input = [Promise.resolve(1), Promise.reject(2), Promise.resolve(3)];
+        return advancedPromise.map(input, mapper).then(
+            assert.fail,
+            function(result) {
+                assert(result === 2);
+            }
+        );
+    });
+});
 //
 // describe("advancedPromise.map-test with concurrency", function () {
 //
@@ -252,4 +257,4 @@ describe("advancedPromise.map-test", function () {
 //         });
 //         return Promise.all([ret1, ret2]);
 //     });
-});
+// });
