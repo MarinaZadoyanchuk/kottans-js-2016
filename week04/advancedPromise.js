@@ -1,4 +1,4 @@
-const mapIterator  = require('./src/enumerate');
+const enumerable  = require('./src/enumerate');
 
 class advancedPromise extends Promise{
 
@@ -37,48 +37,40 @@ class advancedPromise extends Promise{
 
   static reduce(iterable, reduce, initialValue) {
     return new this((resolve, reject) => {
-      this.resolve(iterable).then(iterableValues => {
-        if ( Object.is(iterableValues, null) || typeof iterableValues[Symbol.iterator] !== 'function' ) {
+      this.resolve(iterable).then(iterableValue => {
+        if ( Object.is(iterableValue, null) || typeof iterableValue[Symbol.iterator] !== 'function' ) {
           reject( new TypeError('first argument is not iterableValues') )
         }
 
-        const arrIterable = [...iterableValues];
-        const iterableLength = arrIterable.length;
+        const arr = [...iterableValue];
+        const arrLength = arr.length;
 
-        if (iterableLength == 0) {
+        if (arrLength == 0) {
           new Promise(() => resolve(initialValue), reject);
-        } else if ( iterableLength == 1 && Object.is(initialValue, undefined) ) {
-          new Promise(() => resolve(arrIterable[0]), reject);
+        } else if ( arrLength == 1 && Object.is(initialValue, undefined) ) {
+          new Promise(() => resolve(arr[0]), reject);
         } else {
           if (typeof reduce !== 'function') {
             reject( new TypeError(reduce + ' is not a function') );
           }
 
-
-          let value = Promise.resolve(!Object.is(initialValue, undefined) ? initialValue : arrIterable.splice(0, 1)[0]);
-
-          this.resolve(mapIterator(arrIterable))
-            .then((arr) => {
-              let done = 0;
-              for (let [index, item] of arr) {
-                done++;
-
-                Promise.resolve(item).then((resultItem) => {
-                  value = value.then(result => reduce(result, resultItem, index, arrIterable), reject);
-                  if (!--done) {
-                    value.then(resolve, reject);
-                  }
-                }, reject)
+          let previousValue = Promise.resolve(!Object.is(initialValue, undefined) ? initialValue : arr.splice(0, 1)[0]);
+          let done = 0;
+          for (let index in arr) {
+            done++;
+            Promise.resolve(arr[index]).then((item) => {
+              previousValue = previousValue.then(result => reduce(result, item, index, arr), reject);
+              if (!--done) {
+                previousValue.then(resolve, reject);
               }
             }, reject)
-
+          }
         }
       })
     })
   }
-
 }
 
-advancedPromise.reduce([0, 1, 2, 3], (value, result) => value + result + 5, 2).then(result => {console.log('hier', result)}).catch(error => {console.log('error', error)});
+advancedPromise.reduce([0, 1, 2, 3], (value, result) => value + result + 5).then(result => {console.log('hier', result)}).catch(error => {console.log('error', error)});
 
 module.exports = advancedPromise;
