@@ -44,9 +44,9 @@ class advancedPromise extends Promise{
         const arrLength = arr.length;
 
         if (arrLength == 0) {
-          new Promise(() => resolve(initialValue), reject);
+          new this(() => resolve(initialValue), reject);
         } else if ( arrLength == 1 && Object.is(initialValue, undefined) ) {
-          new Promise(() => resolve(arr[0]), reject);
+          new this(() => resolve(arr[0]), reject);
         } else {
           if (typeof reduce !== 'function') {
             reject( new TypeError(reduce + ' is not a function') );
