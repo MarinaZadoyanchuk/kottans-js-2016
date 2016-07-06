@@ -1,5 +1,3 @@
-const enumerable  = require('./src/enumerate');
-
 class advancedPromise extends Promise{
 
   static map(iterable, mapper) {
@@ -21,8 +19,8 @@ class advancedPromise extends Promise{
           Promise.resolve(promise)
             .then(result => {
               Promise.resolve(mapper(result))
-                .then(result => {
-                  arrResults.push(result);
+                .then(mapperResult => {
+                  arrResults.push(mapperResult);
                   if ( !--done )
                     resolve(arrResults);
                 }, reject)
@@ -69,8 +67,43 @@ class advancedPromise extends Promise{
       })
     })
   }
-}
 
-advancedPromise.reduce([0, 1, 2, 3], (value, result) => value + result + 5).then(result => {console.log('hier', result)}).catch(error => {console.log('error', error)});
+  static some(iterable, count) {
+    return new this((resolve, reject) => {
+      this.resolve(iterable)
+        .then(iterableValue => {
+
+          if ( Object.is(iterableValue, null) || typeof iterableValue[Symbol.iterator] !== 'function' ) {
+            reject (new TypeError('first argument is not iterableValues'));
+          }
+
+          if ( !Number.isInteger(count) || count < 0) {
+            reject (new TypeError('count is not integer or not positive'));
+          }
+
+          const arr = [...iterableValue];
+          const arrLength = arr.length;
+          let arrResults = [];
+
+
+          if (count > arrLength) {
+            reject(new RangeError('count greater length iterable'))
+          }
+
+          for (let item of arr) {
+            this.resolve(item)
+              .then(itemResult => {
+                if (arrResults.length < count) {
+                  arrResults.push(itemResult);
+                } else {
+                  resolve(arrResults);
+                }
+
+              }, reject)
+          }
+        }, reject)
+    })
+  }
+}
 
 module.exports = advancedPromise;
