@@ -2,4 +2,4 @@
 node_modules/
 .idea/
 tests/
-package.json
+./package.json
